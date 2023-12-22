@@ -15,19 +15,21 @@ const pool = new Pool({
     user: 'postgres',
     host: 'localhost',
     database: 'basic_full_stack',
-    passsword: process.env.DB_PASSWORD,
+    password: process.env.DB_PASSWORD,
     port: 5432
 });
 
 //get request handler for search
 app.get('/search', async (req, res) => {
-    try {
-        const searchQuery = req.query.q; //eg: /search?q=Smith
-        const { rows } = await pool.query('SELECT * FROM users WHERE LOWER(last_name) = $1', [`${searchQuery}`]);
-        res.json(rows);
-    } catch (error) {
-        res.status(500).send(error);
-    }
+  try {
+    const searchQuery = req.query.q.toLowerCase(); //eg: /search?q=Smith
+    const { rows } = await pool.query('SELECT * FROM users WHERE LOWER(last_name) = $1', [`${searchQuery}`]);
+    //const { rows } = await pool.query('SELECT * FROM users WHERE LOWER(last_name) = $1', ['smith']);
+    //const { rows } = await pool.query('SELECT * FROM users WHERE LOWER(last_name) = 'smith');  
+    res.json(rows);
+  } catch (error) {
+    res.status(500).send(error);
+  }
 })
 
 /*get request handler for search
