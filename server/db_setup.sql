@@ -46,3 +46,7 @@ INSERT INTO users (first_name, last_name) VALUES
 SELECT * FROM WHERE last_name = 'White';
 
 --Write query to select all rows with last names White and non null 1st names
+SELECT * FROM users
+WHERE last_name = 'White' 
+
+CREATE TABLE registration
