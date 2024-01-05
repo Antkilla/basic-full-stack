@@ -15,12 +15,55 @@ app.use(express.json()); //built i middleware for parsing JSON sent in request
 
 //use pool from pg package to create database connection
 const pool = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'basic_full_stack',
-    password: process.env.DB_PASSWORD,
-    port: 5432
+  user: 'postgres',
+  host: 'localhost',
+  database: 'basic_full_stack',
+  password: process.env.DB_PASSWORD,
+  port: 5432 
 });
+
+//authentication middleware
+const authenticateToken = (req, res, next) => {
+  //get the token from the authorization header
+  const authHeader = req.headers['authorization'];
+  const token = authHeader.split('')[1]; //'token' "wertyuijhgffvbnmnb" --> ['token', "yhgvcvb"]
+
+  //if no token provided, return 401 unathorized 
+  if (token === null) {
+    res.status(401).send();
+    //res.sendStatus(401);
+  }
+
+  //verify the token 
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    //if verify fails
+    if(err) {
+      res.sendStatus(403) //if token not valid, send 403 forbidden 
+    }
+    //store the user in a property called user in the request object
+    req.user = user;
+    //proceed to the next middleware/route in the chain
+    next();
+  })
+}
+
+
+
+//only want users to be able to search our name db if they are authenticated
+//get request handler for search only if authenticateToken middleware passes
+app.get('/search', authenticateToken, async (req, res) => {
+  try {
+    const searchQuery = req.query.q.toLowerCase(); //eg: /search?q=Smith
+    const { rows } = await pool.query('SELECT * FROM users Where LOWER(last_name) = $1', [`${searchQuery}`]);
+   //const { rows } = await pool.query('SELECT * FROM users Where LOWER(last_name) = $1', ['Smith']);
+   //const { rows } = await pool.query('SELECT * FROM users Where LOWER(last_name) = $1', Smith);
+   res.json(rows);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+
 
 //get request handler for search
 app.get('/search', async (req, res) => {
