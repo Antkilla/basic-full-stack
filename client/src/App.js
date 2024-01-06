@@ -1,8 +1,10 @@
 //useState - search terms, results
 //map results to our list
 //key (item id)
-//onchange for the search term
+//onchange for the searcTterm and results
+const [searchTerm, setSeasrchTerm]
 
+//create state variable for seatchterm
 import React, { useState } from 'react'
 
 function App() {

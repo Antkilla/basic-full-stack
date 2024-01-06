@@ -26,8 +26,10 @@ const pool = new Pool({
 const authenticateToken = (req, res, next) => {
   //get the token from the authorization header
   const authHeader = req.headers['authorization'];
-  const token = authHeader.split('')[1]; //'token' "wertyuijhgffvbnmnb" --> ['token', "yhgvcvb"]
-
+  const token = null
+  if (authHeader) {  
+    token = authHeader.split('')[1]; //'token' "wertyuijhgffvbnmnb" --> ['token', "yhgvcvb"]
+  }
   //if no token provided, return 401 unathorized 
   if (token === null) {
     res.status(401).send();
